@@ -7,6 +7,13 @@ import { MyButton } from './components/myButton'
 function App() {
   const [count, setCount] = useState(0)
 
+	const [currentBid, setCurrentBid] = useState(0);
+
+	function handleClick() {
+		setCurrentBid(currentBid + 1)
+	}
+
+
   return (
     <>
       <div>
@@ -29,7 +36,8 @@ function App() {
       <p className="read-the-docs">
         Click on the Vite and React logos to learn more
       </p>
-      <MyButton />
+      <MyButton currentBid={currentBid} onClick={handleClick}/>
+      <MyButton currentBid={currentBid} onClick={handleClick}/>
     </>
   )
 }

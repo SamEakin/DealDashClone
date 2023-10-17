@@ -1,15 +1,10 @@
 import { useState } from "react";
 
-export function MyButton() {
-	const [currentBid, setCurrentBid] = useState(0);
-
-	function handleClick() {
-		setCurrentBid(currentBid + 1)
-	}
+export function MyButton({currentBid, onClick}) {
 	
 	return (
-	  <button onClick={handleClick}>
-		{ currentBid } bid
+	  <button onClick={onClick}>
+		current bid = { currentBid }
 	  </button>
 	);
   }
