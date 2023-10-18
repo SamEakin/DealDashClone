@@ -1,20 +1,24 @@
-import { useState } from 'react'
-import './App.css'
-import { MyButton } from './components/myButton'
+import { useState } from 'react';
+import './App.css';
+import CurrentBid from './components/CurrentBid';
+import MyButton from './components/MyButton';
 
 function App() {
 
-	const [currentBid, setCurrentBid] = useState(0);
+  const [currentBid, setCurrentBid] = useState(1);
+  const [total, setTotal] = useState(0);
 
-	function handleClick() {
-		setCurrentBid(currentBid + 1)
-	}
+
+  function handleClick() {
+    console.log("clicked")
+    setTotal(total + currentBid)
+  }
 
 
   return (
     <>
-      <MyButton currentBid={currentBid} onClick={handleClick}/>
-      <MyButton currentBid={currentBid} onClick={handleClick}/>
+      <CurrentBid currentBidAmount={total} />
+      <MyButton bidAmount={currentBid} onClick={handleClick} />
     </>
   )
 }

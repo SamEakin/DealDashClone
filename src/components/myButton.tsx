@@ -1,10 +1,15 @@
-import { useState } from "react";
+import { Button } from "@mantine/core";
 
-export function MyButton({currentBid, onClick}) {
-	
+interface MyButtonProps {
+	bidAmount: number,
+	onClick: (() => any)
+}
+
+export default function MyButton({ bidAmount, onClick }: MyButtonProps) {
+
 	return (
-	  <button onClick={onClick}>
-		current bid = { currentBid }
-	  </button>
+		<Button onClick={onClick}>
+			Enter Bid: {bidAmount}
+		</Button>
 	);
-  }
+}
