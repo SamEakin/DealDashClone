@@ -1,8 +1,7 @@
-import { useState } from 'react';
+import { faker } from '@faker-js/faker';
+import { Container, Grid } from '@mantine/core';
 import './App.css';
 import ItemCard from './components/ItemCard';
-import { faker } from '@faker-js/faker';
-import { Grid, Container } from '@mantine/core';
 
 
 const items = [
@@ -29,16 +28,18 @@ const items = [
 function App() {
   return (
     <Container p="xl">
-      <Grid p="lg" maw={400}>
+      <Grid p="lg" maw={1000}>
         {items.map((item) => {
           return (
-            <ItemCard
-              id={item.id}
-              name={item.name}
-              description={item.description}
-              src={item.src}
-              bidAmount={1}
-            />
+            <Grid.Col span={4}>
+              <ItemCard
+                id={item.id}
+                name={item.name}
+                description={item.description}
+                src={item.src}
+                bidAmount={1}
+              />
+            </Grid.Col>
           )
         })}
       </Grid>

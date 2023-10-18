@@ -12,7 +12,7 @@ interface ItemCardProps {
 export default function ItemCard(props: ItemCardProps) {
 
   const [total, setTotal] = useState(0);
-  const [deadline, setDeadline] = useState(DateTime.now().plus({ seconds: 10 }));
+  const [deadline, setDeadline] = useState(DateTime.now().plus({ minutes: 1 }));
   const [remainingTime, setRemainingTime] = useState('0');
   const [expired, setExpired] = useState(false);
 
@@ -31,8 +31,16 @@ export default function ItemCard(props: ItemCardProps) {
     }
   }
 
+  function determineColor() {
+    const timeLeft = deadline.diff(DateTime.now(), ["seconds"]);
+
+    if(expired) return "red"
+    if(timeLeft.seconds <= 30) return "yellow"
+    return "green"
+  }
+
   useEffect(() => {
-    const interval = setInterval(() => getTime(), 1000);
+    const interval = setInterval(() => getTime(), 250);
 
     return () => clearInterval(interval);
   }, [deadline]);
@@ -48,8 +56,8 @@ export default function ItemCard(props: ItemCardProps) {
       </Card.Section>
 
       <Group justify="space-between" mt="md" mb="xs">
-        <Text fw={500}>{props.name} - { expired? "SOLD" : remainingTime}</Text>
-        <Badge size="xl" color={expired ? "red" : "green"} variant="light">
+        <Text fw={500}>{props.name} - {expired ? "SOLD" : remainingTime}</Text>
+        <Badge size="xl" color={determineColor()} variant="light">
           ${total}
         </Badge>
       </Group>
