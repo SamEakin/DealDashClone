@@ -8,11 +8,12 @@ interface ItemCardProps {
   description: string,
   src: string,
   bidAmount: number,
+  handleExpiredItem: (id: number) => any,
 }
 export default function ItemCard(props: ItemCardProps) {
 
   const [total, setTotal] = useState(0);
-  const [deadline, setDeadline] = useState(DateTime.now().plus({ minutes: 1 }));
+  const [deadline, setDeadline] = useState(DateTime.now().plus({ seconds: 10 }));
   const [remainingTime, setRemainingTime] = useState('0');
   const [expired, setExpired] = useState(false);
 
@@ -34,8 +35,8 @@ export default function ItemCard(props: ItemCardProps) {
   function determineColor() {
     const timeLeft = deadline.diff(DateTime.now(), ["seconds"]);
 
-    if(expired) return "red"
-    if(timeLeft.seconds <= 30) return "yellow"
+    if (expired) return "red"
+    if (timeLeft.seconds <= 30) return "yellow"
     return "green"
   }
 
@@ -44,6 +45,10 @@ export default function ItemCard(props: ItemCardProps) {
 
     return () => clearInterval(interval);
   }, [deadline]);
+
+  useEffect(() => {
+    if (expired) props.handleExpiredItem(props.id)
+  }, [expired]);
 
   return (
     <Card shadow="sm" padding="lg" radius="md" withBorder mb="lg" mt="lg">
