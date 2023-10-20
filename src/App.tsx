@@ -1,54 +1,52 @@
-import { faker } from '@faker-js/faker';
-import { Container, Grid } from '@mantine/core';
+import { AppShell, Burger, Button, Image, Modal, Title } from '@mantine/core';
+import { useDisclosure } from '@mantine/hooks';
+
 import { useState } from 'react';
 import './App.css';
-import ItemCard from './components/ItemCard';
-
-interface Item {
-  id: number,
-  name: string,
-  description: string,
-  src: string
-}
-
-function generateItem(): Item {
-  return {
-    id: faker.number.int({ max: 1000000 }),
-    name: faker.commerce.product(),
-    description: faker.commerce.productDescription(),
-    src: faker.image.urlLoremFlickr({ category: 'animals' })
-  }
-}
+import ItemsContainer from './components/ItemsContainer';
 
 function App() {
-  const [items, setItems] = useState([generateItem(), generateItem(), generateItem()])
+  const [opened, { toggle }] = useDisclosure();
+  const [modalOpened, modalHandler] = useDisclosure(false);
 
-  function removeItem(id: number) {
-    let newItems = items
-    newItems = newItems.filter(item => item.id !== id)
-    newItems.push(generateItem())
-    setItems(newItems)
+  const [bids, setBids] = useState(10);
+
+  function handleBid() {
+    const remainingBids = bids - 1;
+    setBids(remainingBids)
+    if (remainingBids == 0) modalHandler.open();
+  }
+
+  function handleBuyBids() {
+    setBids(10);
+    modalHandler.close();
   }
 
   return (
-    <Container p="xl">
-      <Grid p="lg" maw={1000}>
-        {items.map((item) => {
-          return (
-            <Grid.Col span={4} key={item.id}>
-              <ItemCard
-                id={item.id}
-                name={item.name}
-                description={item.description}
-                src={item.src}
-                bidAmount={1}
-                handleExpiredItem={removeItem}
-              />
-            </Grid.Col>
-          )
-        })}
-      </Grid>
-    </Container>
+    <AppShell
+      header={{ height: 60 }}
+      navbar={{ width: 300, breakpoint: 'sm', collapsed: { mobile: !opened } }}
+      padding="md"
+    >
+      <AppShell.Header>
+        <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
+        <Title order={1}>Scamville</Title>
+      </AppShell.Header>
+
+      <AppShell.Navbar p="md">
+        Bids: {bids}
+      </AppShell.Navbar>
+
+      <AppShell.Main>
+        <ItemsContainer bids={bids} handleBid={handleBid} />
+        <Modal opened={modalOpened} onClose={() => modalHandler.close()} title="Buy more bids BROKIE...">
+          <Image src="https://www.rollingstone.com/wp-content/uploads/2022/12/andrew-tate-video-analysis.jpg?w=1581&h=1054&crop=1" />
+          <Button onClick={handleBuyBids} >Buy Bids</Button>
+        </Modal>
+      </AppShell.Main>
+
+
+    </AppShell>
   )
 }
 
