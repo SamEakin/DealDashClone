@@ -1,6 +1,8 @@
-import { Badge, Button, Card, Group, Image, Text } from "@mantine/core";
+import { faker } from '@faker-js/faker';
+import { Badge, Box, Button, Card, Group, Image, Text } from "@mantine/core";
 import { DateTime } from "luxon";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { User } from "../App";
 
 interface ItemCardProps {
   id: number;
@@ -8,27 +10,27 @@ interface ItemCardProps {
   description: string;
   src: string;
   bidAmount: number;
-  handleExpiredItem: (id: number, soldAmount: number) => any;
-  handleBid?: () => any;
-  bids?: number;
+  handleExpiredItem: (id: number, soldAmount: number, soldTo: string) => any;
   alreadyExpired?: boolean;
   soldAmount?: number;
+  soldTo?: string;
 }
 export default function ItemCard(props: ItemCardProps) {
-
+  const user = useContext(User);
   const [total, setTotal] = useState(props.soldAmount ? props.soldAmount : 0);
-  const [deadline, setDeadline] = useState(DateTime.now().plus({ seconds: 10 }));
+  const [deadline, setDeadline] = useState(DateTime.now().plus({ seconds: 30 }));
 
   const [remainingTime, setRemainingTime] = useState('0');
   const [expired, setExpired] = useState(props.alreadyExpired ? props.alreadyExpired : false);
   const [highestBidder, setHighestBidder] = useState<string | null>(null);
 
-  function handleBid() {
-    const newDeadline = deadline.plus({ seconds: 30 });
-    setDeadline(newDeadline);
-    setHighestBidder("myself");
-    setTotal(total + 1);
-    if (props.handleBid) props.handleBid();
+  function handleBid(name: string) {
+    setDeadline((oldDeadline) => oldDeadline.plus({ seconds: 5 }));
+    setHighestBidder(name);
+    setTotal((oldTotal) => oldTotal + 1);
+    if (name === user.name) {
+      user.handleBid();
+    }
   }
 
   function getTime() {
@@ -40,12 +42,30 @@ export default function ItemCard(props: ItemCardProps) {
     }
   }
 
+  function isHighestBidder() {
+    if (highestBidder == user.name) return true
+    return false
+  }
+
   function determineColor() {
     const timeLeft = deadline.diff(DateTime.now(), ["seconds"]);
     if (expired) return "red"
     if (timeLeft.seconds <= 30) return "yellow"
     return "green"
   }
+
+  function botActivity() {
+    if (Math.random() > 0.85) {
+      handleBid(faker.person.firstName())
+    }
+  }
+
+  useEffect(() => {
+    if (!props.alreadyExpired) {
+      const interval = setInterval(() => botActivity(), 1000);
+      return () => clearInterval(interval);
+    }
+  }, [])
 
   useEffect(() => {
     if (!props.alreadyExpired) {
@@ -55,8 +75,10 @@ export default function ItemCard(props: ItemCardProps) {
   }, [deadline]);
 
   useEffect(() => {
-    if (!props.alreadyExpired && expired) {
-      props.handleExpiredItem(props.id, total);
+    if (!props.alreadyExpired && expired && highestBidder) {
+      props.handleExpiredItem(props.id, total, highestBidder);
+    } else if (!props.alreadyExpired && expired) {
+      props.handleExpiredItem(props.id, total, '');
     }
   }, [expired]);
 
@@ -71,7 +93,7 @@ export default function ItemCard(props: ItemCardProps) {
       </Card.Section>
 
       <Group justify="space-between" mt="md" mb="xs">
-        <Text fw={500}>{props.name} - {expired ? "SOLD" : remainingTime}</Text>
+        <Text fw={500}>{props.name} {!expired ? `- ${remainingTime}` : null}</Text>
         <Badge size="xl" color={determineColor()} variant="light">
           ${total}
         </Badge>
@@ -81,11 +103,18 @@ export default function ItemCard(props: ItemCardProps) {
         {props.description}
       </Text>
 
-      {highestBidder ? <Text>Highest Bidder: {highestBidder}</Text> : null}
+      {highestBidder ? <Badge bg={highestBidder == user.name ? "green" : "gray"}>Highest Bidder: {highestBidder}</Badge> : null}
 
-      <Button bg={expired ? "gray" : "cyan"} onClick={handleBid} disabled={expired || props.bids == 0}>
-        Bid
-      </Button>
+      <Box style={{ display: "flex", justifyContent: "center" }}>
+        {
+          !expired
+            ? <Button mt='lg' bg={expired ? "gray" : "cyan"} onClick={() => handleBid(user.name)} disabled={user.bids == 0 || isHighestBidder()}>
+              Bid
+            </Button>
+            : <Badge bg={props.soldTo ? "green" : "red"} mt='lg'>{props.soldTo ? `Won by: ${props.soldTo}` : 'Expired'}</Badge>
+        }
+      </Box>
+
     </Card>
   )
 }

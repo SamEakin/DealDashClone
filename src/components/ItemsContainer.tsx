@@ -9,14 +9,10 @@ interface Item {
   description: string;
   src: string;
   soldAmount?: number;
+  soldTo?: string;
 }
 
-interface ItemContainerProps {
-  bids: number;
-  handleBid: () => any;
-}
-
-export default function ItemsContainer({ handleBid, bids }: ItemContainerProps) {
+export default function ItemsContainer() {
   const [items, setItems] = useState([generateItem(), generateItem(), generateItem()]);
   const [expiredItems, setExpiredItems] = useState<Item[]>([]);
   const [activePage, setPage] = useState(1);
@@ -26,17 +22,18 @@ export default function ItemsContainer({ handleBid, bids }: ItemContainerProps) 
       id: faker.number.int({ min: 10, max: 1000000000 }),
       name: faker.commerce.product(),
       description: faker.commerce.productDescription(),
-      src: faker.image.urlLoremFlickr({ category: 'animals' })
+      src: faker.image.urlLoremFlickr({ category: 'animals' }),
     }
   }
 
-  function removeItem(id: number, soldAmount: number) {
+  function removeItem(id: number, soldAmount: number, soldTo: string) {
     setItems((oldItems) => [...oldItems.filter(item => item.id !== id), generateItem()]);
 
     // Add to expired array
     const expiredItem = items.find(item => item.id === id);
     if (expiredItem) {
       expiredItem.soldAmount = soldAmount;
+      expiredItem.soldTo = soldTo
       setExpiredItems((oldItems) => [...oldItems, expiredItem]);
     }
   }
@@ -54,8 +51,6 @@ export default function ItemsContainer({ handleBid, bids }: ItemContainerProps) 
                 src={item.src}
                 bidAmount={1}
                 handleExpiredItem={removeItem}
-                bids={bids}
-                handleBid={handleBid}
               />
             </Grid.Col>
           )
@@ -77,6 +72,7 @@ export default function ItemsContainer({ handleBid, bids }: ItemContainerProps) 
                 handleExpiredItem={removeItem}
                 alreadyExpired={true}
                 soldAmount={item.soldAmount}
+                soldTo={item.soldTo}
               />
             </Grid.Col>
           )
