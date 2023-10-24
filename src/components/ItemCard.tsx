@@ -18,11 +18,12 @@ interface ItemCardProps {
 export default function ItemCard(props: ItemCardProps) {
   const user = useContext(User);
   const [total, setTotal] = useState(props.soldAmount ? props.soldAmount : 0);
-  const [deadline, setDeadline] = useState(DateTime.now().plus({ seconds: 30 }));
+  const [deadline, setDeadline] = useState(DateTime.now().plus({ seconds: 15 }));
 
   const [remainingTime, setRemainingTime] = useState('0');
   const [expired, setExpired] = useState(props.alreadyExpired ? props.alreadyExpired : false);
   const [highestBidder, setHighestBidder] = useState<string | null>(null);
+  const [backgroundColor, setBackgroundColor] = useState({ backgroundColor: "white" });
 
   function handleBid(name: string) {
     setDeadline((oldDeadline) => oldDeadline.plus({ seconds: 5 }));
@@ -39,6 +40,7 @@ export default function ItemCard(props: ItemCardProps) {
       setExpired(true)
     } else {
       setRemainingTime(timeLeft.toFormat('m:ss'))
+      determineBackgroundColor()
     }
   }
 
@@ -52,6 +54,17 @@ export default function ItemCard(props: ItemCardProps) {
     if (expired) return "red"
     if (timeLeft.seconds <= 30) return "yellow"
     return "green"
+  }
+
+  function determineBackgroundColor() {
+    const timeLeft = deadline.diff(DateTime.now(), ["seconds"]).seconds;
+    if (highestBidder == user.name) {
+      setBackgroundColor({ backgroundColor: "#e6ffe6" }) // light green
+    } else if (timeLeft < 10) {
+      setBackgroundColor({ backgroundColor: "#fff2e1" }) // light orange
+    } else {
+      setBackgroundColor({ backgroundColor: "white" })
+    }
   }
 
   function botActivity() {
@@ -82,8 +95,10 @@ export default function ItemCard(props: ItemCardProps) {
     }
   }, [expired]);
 
+
+
   return (
-    <Card shadow="lg" padding="lg" radius="md" withBorder mb="lg" mt="lg">
+    <Card shadow="lg" padding="lg" radius="md" withBorder mb="lg" mt="lg" style={backgroundColor}>
       <Card.Section>
         <Image
           src={props.src}
