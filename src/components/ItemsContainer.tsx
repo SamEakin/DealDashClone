@@ -1,7 +1,7 @@
-import { faker } from '@faker-js/faker';
-import { Container, Divider, Grid, Pagination } from '@mantine/core';
-import { useState } from 'react';
-import ItemCard from './ItemCard';
+import { faker } from "@faker-js/faker";
+import { Container, Divider, Grid, Pagination } from "@mantine/core";
+import { useState } from "react";
+import ItemCard from "./ItemCard";
 
 interface Item {
   id: number;
@@ -13,7 +13,11 @@ interface Item {
 }
 
 export default function ItemsContainer() {
-  const [items, setItems] = useState([generateItem(), generateItem(), generateItem()]);
+  const [items, setItems] = useState([
+    generateItem(),
+    generateItem(),
+    generateItem(),
+  ]);
   const [expiredItems, setExpiredItems] = useState<Item[]>([]);
   const [activePage, setPage] = useState(1);
 
@@ -22,18 +26,21 @@ export default function ItemsContainer() {
       id: faker.number.int({ min: 10, max: 1000000000 }),
       name: faker.commerce.product(),
       description: faker.commerce.productDescription(),
-      src: faker.image.urlLoremFlickr({ category: 'animals' }),
-    }
+      src: faker.image.urlLoremFlickr({ category: "animals" }),
+    };
   }
 
   function removeItem(id: number, soldAmount: number, soldTo: string) {
-    setItems((oldItems) => [...oldItems.filter(item => item.id !== id), generateItem()]);
+    setItems((oldItems) => [
+      ...oldItems.filter((item) => item.id !== id),
+      generateItem(),
+    ]);
 
     // Add to expired array
-    const expiredItem = items.find(item => item.id === id);
+    const expiredItem = items.find((item) => item.id === id);
     if (expiredItem) {
       expiredItem.soldAmount = soldAmount;
-      expiredItem.soldTo = soldTo
+      expiredItem.soldTo = soldTo;
       setExpiredItems((oldItems) => [...oldItems, expiredItem]);
     }
   }
@@ -53,7 +60,7 @@ export default function ItemsContainer() {
                 handleExpiredItem={removeItem}
               />
             </Grid.Col>
-          )
+          );
         })}
       </Grid>
 
@@ -75,10 +82,14 @@ export default function ItemsContainer() {
                 soldTo={item.soldTo}
               />
             </Grid.Col>
-          )
+          );
         })}
       </Grid>
-      <Pagination value={activePage} onChange={setPage} total={expiredItems.length / 3} />
+      <Pagination
+        value={activePage}
+        onChange={setPage}
+        total={expiredItems.length / 3}
+      />
     </Container>
-  )
+  );
 }

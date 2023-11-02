@@ -1,8 +1,9 @@
-import { faker } from '@faker-js/faker';
+import { faker } from "@faker-js/faker";
 import { Badge, Box, Button, Card, Group, Image, Text } from "@mantine/core";
 import { DateTime } from "luxon";
 import { useContext, useEffect, useState } from "react";
 import { User } from "../App";
+import ItemInfo from "./ItemInfo";
 
 interface ItemCardProps {
   id: number;
@@ -18,12 +19,18 @@ interface ItemCardProps {
 export default function ItemCard(props: ItemCardProps) {
   const user = useContext(User);
   const [total, setTotal] = useState(props.soldAmount ? props.soldAmount : 0);
-  const [deadline, setDeadline] = useState(DateTime.now().plus({ seconds: 15 }));
+  const [deadline, setDeadline] = useState(
+    DateTime.now().plus({ seconds: 15 })
+  );
 
-  const [remainingTime, setRemainingTime] = useState('0');
-  const [expired, setExpired] = useState(props.alreadyExpired ? props.alreadyExpired : false);
+  const [remainingTime, setRemainingTime] = useState("0");
+  const [expired, setExpired] = useState(
+    props.alreadyExpired ? props.alreadyExpired : false
+  );
   const [highestBidder, setHighestBidder] = useState<string | null>(null);
-  const [backgroundColor, setBackgroundColor] = useState({ backgroundColor: "white" });
+  const [backgroundColor, setBackgroundColor] = useState({
+    backgroundColor: "white",
+  });
 
   function handleBid(name: string) {
     setDeadline((oldDeadline) => oldDeadline.plus({ seconds: 5 }));
@@ -37,39 +44,39 @@ export default function ItemCard(props: ItemCardProps) {
   function getTime() {
     const timeLeft = deadline.diff(DateTime.now(), ["seconds"]);
     if (timeLeft.seconds <= 0) {
-      setExpired(true)
+      setExpired(true);
     } else {
-      setRemainingTime(timeLeft.toFormat('m:ss'))
-      determineBackgroundColor()
+      setRemainingTime(timeLeft.toFormat("m:ss"));
+      determineBackgroundColor();
     }
   }
 
   function isHighestBidder() {
-    if (highestBidder == user.name) return true
-    return false
+    if (highestBidder == user.name) return true;
+    return false;
   }
 
   function determineColor() {
     const timeLeft = deadline.diff(DateTime.now(), ["seconds"]);
-    if (expired) return "red"
-    if (timeLeft.seconds <= 30) return "yellow"
-    return "green"
+    if (expired) return "red";
+    if (timeLeft.seconds <= 30) return "yellow";
+    return "green";
   }
 
   function determineBackgroundColor() {
     const timeLeft = deadline.diff(DateTime.now(), ["seconds"]).seconds;
     if (highestBidder == user.name) {
-      setBackgroundColor({ backgroundColor: "#e6ffe6" }) // light green
+      setBackgroundColor({ backgroundColor: "#e6ffe6" }); // light green
     } else if (timeLeft < 10) {
-      setBackgroundColor({ backgroundColor: "#fff2e1" }) // light orange
+      setBackgroundColor({ backgroundColor: "#fff2e1" }); // light orange
     } else {
-      setBackgroundColor({ backgroundColor: "white" })
+      setBackgroundColor({ backgroundColor: "white" });
     }
   }
 
   function botActivity() {
     if (Math.random() > 0.85) {
-      handleBid(faker.person.firstName())
+      handleBid(faker.person.firstName());
     }
   }
 
@@ -78,7 +85,7 @@ export default function ItemCard(props: ItemCardProps) {
       const interval = setInterval(() => botActivity(), 1000);
       return () => clearInterval(interval);
     }
-  }, [])
+  }, []);
 
   useEffect(() => {
     if (!props.alreadyExpired) {
@@ -91,24 +98,28 @@ export default function ItemCard(props: ItemCardProps) {
     if (!props.alreadyExpired && expired && highestBidder) {
       props.handleExpiredItem(props.id, total, highestBidder);
     } else if (!props.alreadyExpired && expired) {
-      props.handleExpiredItem(props.id, total, '');
+      props.handleExpiredItem(props.id, total, "");
     }
   }, [expired]);
 
-
-
   return (
-    <Card shadow="lg" padding="lg" radius="md" withBorder mb="lg" mt="lg" style={backgroundColor}>
+    <Card
+      shadow="lg"
+      padding="lg"
+      radius="md"
+      withBorder
+      mb="lg"
+      mt="lg"
+      style={backgroundColor}
+    >
       <Card.Section>
-        <Image
-          src={props.src}
-          height={160}
-          alt={props.name}
-        />
+        <Image src={props.src} height={160} alt={props.name} />
       </Card.Section>
 
       <Group justify="space-between" mt="md" mb="xs">
-        <Text fw={500}>{props.name} {!expired ? `- ${remainingTime}` : null}</Text>
+        <Text fw={500}>
+          {props.name} {!expired ? `- ${remainingTime}` : null}
+        </Text>
         <Badge size="xl" color={determineColor()} variant="light">
           ${total}
         </Badge>
@@ -118,18 +129,28 @@ export default function ItemCard(props: ItemCardProps) {
         {props.description}
       </Text>
 
-      {highestBidder ? <Badge bg={highestBidder == user.name ? "green" : "gray"}>Highest Bidder: {highestBidder}</Badge> : null}
+      {highestBidder ? (
+        <Badge bg={highestBidder == user.name ? "green" : "gray"}>
+          Highest Bidder: {highestBidder}
+        </Badge>
+      ) : null}
 
       <Box style={{ display: "flex", justifyContent: "center" }}>
-        {
-          !expired
-            ? <Button mt='lg' bg={expired ? "gray" : "cyan"} onClick={() => handleBid(user.name)} disabled={user.bids == 0 || isHighestBidder()}>
-              Bid
-            </Button>
-            : <Badge bg={props.soldTo ? "green" : "red"} mt='lg'>{props.soldTo ? `Won by: ${props.soldTo}` : 'Expired'}</Badge>
-        }
+        {!expired ? (
+          <Button
+            mt="lg"
+            bg={expired ? "gray" : "cyan"}
+            onClick={() => handleBid(user.name)}
+            disabled={user.bids == 0 || isHighestBidder()}
+          >
+            Bid
+          </Button>
+        ) : (
+          <Badge bg={props.soldTo ? "green" : "red"} mt="lg">
+            {props.soldTo ? `Won by: ${props.soldTo}` : "Expired"}
+          </Badge>
+        )}
       </Box>
-
     </Card>
-  )
+  );
 }
