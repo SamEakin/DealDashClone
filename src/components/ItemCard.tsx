@@ -3,7 +3,6 @@ import { Badge, Box, Button, Card, Group, Image, Text } from "@mantine/core";
 import { DateTime } from "luxon";
 import { useContext, useEffect, useState } from "react";
 import { User } from "../App";
-import ItemInfo from "./ItemInfo";
 
 interface ItemCardProps {
   id: number;
@@ -81,11 +80,11 @@ export default function ItemCard(props: ItemCardProps) {
   }
 
   useEffect(() => {
-    if (!props.alreadyExpired) {
+    if (botActivity && !props.alreadyExpired) {
       const interval = setInterval(() => botActivity(), 1000);
       return () => clearInterval(interval);
     }
-  }, []);
+  }, [botActivity]);
 
   useEffect(() => {
     if (!props.alreadyExpired) {

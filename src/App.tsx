@@ -25,6 +25,7 @@ function App() {
   const [id, setId] = useState(1);
   const [name, setName] = useState("Samuel");
   const [bids, setBids] = useState(2);
+  const [botActivity, setBotActivity] = useState(false);
 
   function handleBid() {
     const remainingBids = bids - 1;
@@ -35,6 +36,10 @@ function App() {
   function handleBuyBids() {
     setBids(bids + 10);
     modalHandler.close();
+  }
+
+  function handleBotActivityToggle() {
+    setBotActivity(!botActivity);
   }
 
   return (
@@ -51,6 +56,13 @@ function App() {
       <AppShell.Navbar p="md">
         Bids: {bids}
         <Button onClick={handleBuyBids}>Buy Bids</Button>
+        <Button
+          onClick={handleBotActivityToggle}
+          bg={botActivity ? "red" : "green"}
+        >
+          {botActivity ? "Disable " : "Enable "}
+          Bot Activity
+        </Button>
       </AppShell.Navbar>
 
       <AppShell.Main>
