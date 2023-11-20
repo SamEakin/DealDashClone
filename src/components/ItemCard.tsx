@@ -23,8 +23,6 @@ export default function ItemCard(props: ItemCardProps) {
     DateTime.now().plus({ seconds: 15 })
   );
 
-  const [botActive, setBotActive] = useState(props.botActivity);
-
   const [remainingTime, setRemainingTime] = useState("0");
   const [expired, setExpired] = useState(
     props.alreadyExpired ? props.alreadyExpired : false
@@ -76,18 +74,18 @@ export default function ItemCard(props: ItemCardProps) {
     }
   }
 
-  function botActivity() {
+  function botPlaceBid() {
     if (Math.random() > 0.85) {
       handleBid(faker.person.firstName());
     }
   }
 
   useEffect(() => {
-    if (botActive && !props.alreadyExpired) {
-      const interval = setInterval(() => botActivity(), 1000);
+    if (props.botActivity && !props.alreadyExpired) {
+      const interval = setInterval(() => botPlaceBid(), 1000);
       return () => clearInterval(interval);
     }
-  }, [botActive]);
+  }, [props.botActivity]);
 
   useEffect(() => {
     if (!props.alreadyExpired) {

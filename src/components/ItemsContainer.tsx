@@ -1,5 +1,5 @@
 import { faker } from "@faker-js/faker";
-import { Container, Divider, Grid, Pagination } from "@mantine/core";
+import { Container, Divider, Grid } from "@mantine/core";
 import { useState } from "react";
 import ItemCard from "./ItemCard";
 
@@ -12,14 +12,17 @@ interface Item {
   soldTo?: string;
 }
 
-export default function ItemsContainer() {
+interface ItemsContainerProps {
+  botActivity: boolean;
+}
+
+export default function ItemsContainer(props: ItemsContainerProps) {
   const [items, setItems] = useState([
     generateItem(),
     generateItem(),
     generateItem(),
   ]);
   const [expiredItems, setExpiredItems] = useState<Item[]>([]);
-  const [activePage, setPage] = useState(1);
 
   function generateItem(): Item {
     return {
@@ -58,6 +61,7 @@ export default function ItemsContainer() {
                 src={item.src}
                 bidAmount={1}
                 handleExpiredItem={removeItem}
+                botActivity={props.botActivity}
               />
             </Grid.Col>
           );
@@ -80,16 +84,12 @@ export default function ItemsContainer() {
                 alreadyExpired={true}
                 soldAmount={item.soldAmount}
                 soldTo={item.soldTo}
+                botActivity={false}
               />
             </Grid.Col>
           );
         })}
       </Grid>
-      <Pagination
-        value={activePage}
-        onChange={setPage}
-        total={expiredItems.length / 3}
-      />
     </Container>
   );
 }
