@@ -12,10 +12,10 @@ interface User {
   handleBid: () => void;
 }
 
-export const User = createContext<User>({
+export const UserContext = createContext<User>({
   id: 1,
   name: "Samuel",
-  bids: 1,
+  bids: 4,
   handleBid: () => console.log("handleBid"),
 });
 
@@ -66,9 +66,9 @@ function App() {
       </AppShell.Navbar>
 
       <AppShell.Main>
-        <User.Provider value={{ id: id, name: name, bids, handleBid }}>
-          <ItemsContainer />
-        </User.Provider>
+        <UserContext.Provider value={{ id: id, name: name, bids, handleBid }}>
+          <ItemsContainer botActivity={botActivity} />
+        </UserContext.Provider>
         <Modal
           opened={modalOpened}
           onClose={() => modalHandler.close()}

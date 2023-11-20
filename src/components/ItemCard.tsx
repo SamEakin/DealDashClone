@@ -2,7 +2,7 @@ import { faker } from "@faker-js/faker";
 import { Badge, Box, Button, Card, Group, Image, Text } from "@mantine/core";
 import { DateTime } from "luxon";
 import { useContext, useEffect, useState } from "react";
-import { User } from "../App";
+import { UserContext } from "../App";
 
 interface ItemCardProps {
   id: number;
@@ -14,13 +14,16 @@ interface ItemCardProps {
   alreadyExpired?: boolean;
   soldAmount?: number;
   soldTo?: string;
+  botActivity: boolean;
 }
 export default function ItemCard(props: ItemCardProps) {
-  const user = useContext(User);
+  const user = useContext(UserContext);
   const [total, setTotal] = useState(props.soldAmount ? props.soldAmount : 0);
   const [deadline, setDeadline] = useState(
     DateTime.now().plus({ seconds: 15 })
   );
+
+  const [botActive, setBotActive] = useState(props.botActivity);
 
   const [remainingTime, setRemainingTime] = useState("0");
   const [expired, setExpired] = useState(
@@ -80,11 +83,11 @@ export default function ItemCard(props: ItemCardProps) {
   }
 
   useEffect(() => {
-    if (botActivity && !props.alreadyExpired) {
+    if (botActive && !props.alreadyExpired) {
       const interval = setInterval(() => botActivity(), 1000);
       return () => clearInterval(interval);
     }
-  }, [botActivity]);
+  }, [botActive]);
 
   useEffect(() => {
     if (!props.alreadyExpired) {
